@@ -4,7 +4,7 @@
    Date: 17/11/2016
    Author: qinjiangbo@github.io
    Description:
-      Document class is mainly used to process the documents
+   class for corpus which has m documents
 """
 
 class Documents(object):
