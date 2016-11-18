@@ -102,6 +102,7 @@ class LDA(object):
                 self.thetaSum[k][v] = 0.0
         return self
 
+    # initial state of the model
     def initial_state(self):
         for m in range(self.M):
             '''
@@ -117,12 +118,45 @@ class LDA(object):
                 '''
                 self.z[m].append(topic)
                 '''
-                    self.nw is relevant word-topic distribution, but here, it
+                    self.nw is relevant word-topic matrix, but here, it
                     records the occurrences of each term in this topic
                 '''
                 self.nw[self.D[m][n]][topic] = self.nw[self.D[m][n]].get(topic, 0) + 1
+                '''
+                    self.nd is relevant document-topic matrix, here it is also
+                    the occurrences of the topic
+                '''
+                self.nd[m][topic] = self.nd[m].get(topic, 0) + 1
+                '''
+                    self.nwSum is total number of words under each topic
+                '''
+                self.nwSum[topic] = self.nwSum.get(topic, 0) + 1
+                n += 1
+            '''
+                self.ndSum is total number of words in each document
+            '''
+            self.ndSum[m] = N
+            m += 1
 
-
+    # sample the corpus
+    def sample_full_condition(self, m, n):
+        '''
+        :param m: number of document
+        :param n: place of document
+        :param self.D[m][n]: number of term
+        '''
+        topic = self.z[m][n]
+        '''
+            -1 the four -1s here are mainly used to remove the affection
+            of the term itself
+        '''
+        self.nw[self.D[m][n]][topic] -= 1
+        self.nd[m][topic] -= 1
+        self.nwSum[topic] -= 1
+        self.ndSum[topic] -= 1
+        '''
+            p the
+        '''
 
     # gibbs sampling algorithm
     def gibbs(self, alpha=2, beta=0.5):
