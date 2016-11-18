@@ -6,6 +6,7 @@
    Description:
    LDA core algorithms of topic model
 """
+import random
 
 
 class LDA(object):
@@ -100,6 +101,28 @@ class LDA(object):
             for v in range(self.V):
                 self.thetaSum[k][v] = 0.0
         return self
+
+    def initial_state(self):
+        for m in range(self.M):
+            '''
+                N represents the number of words in current document
+            '''
+            N = len(self.D[m])
+            self.z[m] = []
+            for n in range(N):
+                topic = int(random.random() * self.K)
+                '''
+                    self.z records the topic distribution of each document,
+                    at initial state, they are random
+                '''
+                self.z[m].append(topic)
+                '''
+                    self.nw is relevant word-topic distribution, but here, it
+                    records the occurrences of each term in this topic
+                '''
+                self.nw[self.D[m][n]][topic] = self.nw[self.D[m][n]].get(topic, 0) + 1
+
+
 
     # gibbs sampling algorithm
     def gibbs(self, alpha=2, beta=0.5):
