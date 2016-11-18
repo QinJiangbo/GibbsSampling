@@ -578,4 +578,3 @@ class StopWords(object):
     def remove(self, word):
         StopWords.set.remove(word)
         return word
-
