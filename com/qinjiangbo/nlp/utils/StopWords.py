@@ -579,9 +579,3 @@ class StopWords(object):
         StopWords.set.remove(word)
         return word
 
-
-if "__main__" == __name__:
-    stopWords1 = StopWords.get_instance()
-    stopWords2 = StopWords.get_instance()
-    print(stopWords1 == stopWords2)
-    print(stopWords1.remove("rt"))
