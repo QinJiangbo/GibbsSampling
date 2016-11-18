@@ -573,8 +573,15 @@ class StopWords(object):
         if len(word.strip()) > 0:  # trim blanks in both sides
             StopWords.set.add(word.lower())
 
+    # remove the word from set
+    # @param word
+    def remove(self, word):
+        StopWords.set.remove(word)
+        return word
+
 
 if "__main__" == __name__:
     stopWords1 = StopWords.get_instance()
     stopWords2 = StopWords.get_instance()
     print(stopWords1 == stopWords2)
+    print(stopWords1.remove("rt"))
