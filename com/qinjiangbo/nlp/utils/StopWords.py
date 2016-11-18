@@ -11,12 +11,13 @@ class StopWords(object):
     set = set()  # hash set for storing stop words
     INSTANCE = None  # singleton
 
-    def get_instance(self):
+    @classmethod
+    def get_instance(cls):  # class method
         if StopWords.INSTANCE == None:
             StopWords.INSTANCE = StopWords()
         return StopWords.INSTANCE
 
-    def __init__(self):
+    def __init__(self):  # instance method
         # Stopwords list from Rainbow
         StopWords.set.add("a")
         StopWords.set.add("able")
@@ -561,3 +562,19 @@ class StopWords(object):
         StopWords.set.add("doesn't")
         StopWords.set.add("w/")
         StopWords.set.add("w/o")
+
+    # remove all stopwords
+    def clear(self):
+        StopWords.set.clear()
+
+    # add the word to set
+    # @param word
+    def add(self, word):
+        if len(word.strip()) > 0:  # trim blanks in both sides
+            StopWords.set.add(word.lower())
+
+
+if "__main__" == __name__:
+    stopWords1 = StopWords.get_instance()
+    stopWords2 = StopWords.get_instance()
+    print(stopWords1 == stopWords2)
