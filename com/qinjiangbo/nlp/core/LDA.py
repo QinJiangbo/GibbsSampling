@@ -155,8 +155,49 @@ class LDA(object):
         self.nwSum[topic] -= 1
         self.ndSum[topic] -= 1
         '''
-            p the
+            p the distribution of the theme produced by the dictionary. if the word is T
+            p(k|T) = ((number of T in theme k + beta) / (total number of words in theme k + V * beta))     --->p(T|k)
+                    * ((number of theme k in passage + alpha) / (total number of themes in passage + K * alpha))   --->p(k|d)
         '''
+        p = {}
+        for k in range(self.K):
+            p[k] = (self.nw[self.D[m][n]][k] + self.beta) / (self.nwSum[k] + self.V * self.beta) * (
+                self.nd[m][k] + self.alpha) / (self.ndSum[m] + self.K * self.alpha)
+
+        for k in range(1, len(p)): p[k] += p[k - 1]
+
+        '''
+            we choose the theme for the nth word in mth article
+        '''
+        u = random.random() * p[self.K - 1]
+        for topic in range(len(p)):
+            if u < p[topic]: break
+        self.nw[self.D[m][n]][topic] += 1
+        self.nd[m][topic] += 1
+        self.nwSum[topic] += 1
+        self.ndSum[m] += 1
+        return topic
+
+    # update the params
+    def update_params(self):
+        for m in range(len(self.D)):
+            for k in range(self.K):
+                '''
+                    self.thetaSum[m][k] 是文档m的主题k的概率累加值。
+                                        = 文档的主题k的次数 / 文档的总主题数
+                '''
+                self.thetaSum[m][k] += (self.nd[m][k] + self.alpha) / (self.ndSum[m] + self.K * self.alpha)
+        for k in range(self.K):
+            for w in range(self.V):
+                '''
+                    self.phiSum[k][w] 是主题k-词组w的概率累加值
+                                      = 被分配为主题k的单词的次数 / 主题k包含的单词总数
+                '''
+                self.phiSum[k][w] += (self.nw[w][k] + self.beta) / (self.nwSum[k] + self.V * self.beta)
+        '''
+            self.numStat 对于累加计算次数的统计
+        '''
+        self.numStat += 1
 
     # gibbs sampling algorithm
     def gibbs(self, alpha=2, beta=0.5):
