@@ -146,7 +146,7 @@ class LDA(object):
     def sample_full_condition(self, m, n):
         '''
         :param m: number of document
-        :param n: place of document
+        :param n: position of document
         :param self.D[m][n]: number of term
         '''
         topic = self.z[m][n]
@@ -157,7 +157,7 @@ class LDA(object):
         self.nw[self.D[m][n]][topic] -= 1
         self.nd[m][topic] -= 1
         self.nwSum[topic] -= 1
-        self.ndSum[topic] -= 1
+        self.ndSum[m] -= 1
         '''
             p the distribution of the theme produced by the dictionary. if the word is T
             p(k|T) = ((number of T in theme k + beta) / (total number of words in theme k + V * beta))     --->p(T|k)
