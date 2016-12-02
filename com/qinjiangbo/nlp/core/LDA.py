@@ -9,6 +9,7 @@
 import random
 import time
 
+
 class LDA(object):
     # declaration for parameters in LDA topic model
     def __init__(self, data, k=20):
@@ -223,3 +224,43 @@ class LDA(object):
             '''
             if i > self.burnIn and self.sampleLag > 0 and i % self.sampleLag == 0:
                 self.update_params()
+
+    def get_theta(self):
+        '''
+        theta document-theme distribution
+        :return:
+        '''
+        theta = {}
+        for m in range(self.M):
+            theta[m] = {}
+            for k in range(self.K):
+                theta[m][k] = 0
+        if self.sampleLag > 0:
+            for m in range(self.M):
+                for k in range(self.K):
+                    theta[m][k] = self.thetaSum[m][k] / self.numStat
+        else:
+            for m in range(self.M):
+                for k in range(self.K):
+                    theta[m][k] = (self.nd[m][k] + self.alpha) / (self.ndSum[m] + self.K * self.alpha)
+        return theta
+
+    def get_phi(self):
+        '''
+        phi theme-word distribution
+        :return:
+        '''
+        phi = {}
+        for k in range(self.K):
+            phi[k] = {}
+            for v in range(self.V):
+                phi[k][v] = 0
+        if self.sampleLag > 0:
+            for k in range(self.K):
+                for v in range(self.V):
+                    phi[k][v] = self.phiSum[k][v] / self.numStat
+        else:
+            for k in range(self.K):
+                for v in range(self.V):
+                    phi[k][v] = (self.nw[k][v] + self.alpha) / (self.nwSum[k] + self.K * self.alpha)
+        return phi
