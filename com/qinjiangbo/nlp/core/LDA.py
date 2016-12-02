@@ -7,7 +7,7 @@
    LDA core algorithms of topic model
 """
 import random
-
+import time
 
 class LDA(object):
     # declaration for parameters in LDA topic model
@@ -157,7 +157,7 @@ class LDA(object):
         '''
             p the distribution of the theme produced by the dictionary. if the word is T
             p(k|T) = ((number of T in theme k + beta) / (total number of words in theme k + V * beta))     --->p(T|k)
-                    * ((number of theme k in passage + alpha) / (total number of themes in passage + K * alpha))   --->p(k|d)
+                    * ((number of theme k in document + alpha) / (total number of themes in document + K * alpha))   --->p(k|d)
         '''
         p = {}
         for k in range(self.K):
@@ -167,7 +167,7 @@ class LDA(object):
         for k in range(1, len(p)): p[k] += p[k - 1]
 
         '''
-            we choose the theme for the nth word in mth article
+            we choose the theme for the nth word in mth document
         '''
         u = random.random() * p[self.K - 1]
         for topic in range(len(p)):
@@ -183,19 +183,19 @@ class LDA(object):
         for m in range(len(self.D)):
             for k in range(self.K):
                 '''
-                    self.thetaSum[m][k] 是文档m的主题k的概率累加值。
-                                        = 文档的主题k的次数 / 文档的总主题数
+                    self.thetaSum[m][k] the accumulated probability value of theme k in document m
+                        = the occurrences of theme k in document / total number of themes in document
                 '''
                 self.thetaSum[m][k] += (self.nd[m][k] + self.alpha) / (self.ndSum[m] + self.K * self.alpha)
         for k in range(self.K):
             for w in range(self.V):
                 '''
-                    self.phiSum[k][w] 是主题k-词组w的概率累加值
-                                      = 被分配为主题k的单词的次数 / 主题k包含的单词总数
+                    self.phiSum[k][w] the accumulated probability value for theme-word duple
+                        = the occurrences of word assigned to theme k / total number of words in theme k
                 '''
                 self.phiSum[k][w] += (self.nw[w][k] + self.beta) / (self.nwSum[k] + self.V * self.beta)
         '''
-            self.numStat 对于累加计算次数的统计
+            self.numStat the statistic of accumulation
         '''
         self.numStat += 1
 
@@ -206,3 +206,20 @@ class LDA(object):
         if self.sampleLag > 0:
             self.set_thetaSum().set_phiSum()
             self.numStat = 0.0
+        self.initial_state()
+        for i in range(self.maxIter):
+            if i % 1000 == 0:
+                print("iteration", i, time.ctime())
+            for m in range(len(self.z)):
+                for n in range(len(self.z[m])):
+                    '''
+                        self.z[m][n] here updates the distribution of nth word in mth document
+                    '''
+                    self.z[m][n] = self.sample_full_condition(m, n)
+            '''
+                self.burnIn is to ignore the some sampling results
+                It is common to ignore some number of samples at the beginning (the so-called burn-in period)
+                self.sampleLag is to control the update frequency
+            '''
+            if i > self.burnIn and self.sampleLag > 0 and i % self.sampleLag == 0:
+                self.update_params()
