@@ -27,14 +27,18 @@ class LDA(object):
         self.nwSum = {}  # total number of words assigned to topic j
         self.ndSum = {}  # total number of words in document i
         self.z = {}  # topic assignments for each word
-        self.phiSum = 0
+        self.phiSum = {}
         self.numStat = 0.0
         self.thetaSum = {}
         self.run()
 
     # initialize the variables
     def run(self):
-        pass
+        self.set_V() \
+            .set_ND() \
+            .set_NW() \
+            .set_NWSUM() \
+            .set_NDSUM()
 
     def set_NDSUM(self):
         for i in range(self.M):
@@ -57,7 +61,7 @@ class LDA(object):
         for i in range(self.M):
             self.nd[i] = {}
             for j in range(self.K):
-                self.nw[i][j] = 0.0
+                self.nd[i][j] = 0.0
         return self
 
     def set_M(self, value=0):
@@ -69,7 +73,6 @@ class LDA(object):
         for s in self.D:
             Set = Set | set(s)
         self.V = len(Set)
-        print("self.V=%s" % self.V)
         return self
 
     def set_K(self, value):
@@ -100,7 +103,7 @@ class LDA(object):
         for k in range(self.K):
             self.phiSum[k] = {}
             for v in range(self.V):
-                self.thetaSum[k][v] = 0.0
+                self.phiSum[k][v] = 0.0
         return self
 
     # initial state of the model
@@ -264,3 +267,19 @@ class LDA(object):
                 for v in range(self.V):
                     phi[k][v] = (self.nw[k][v] + self.alpha) / (self.nwSum[k] + self.K * self.alpha)
         return phi
+
+
+if "__main__" == __name__:
+    documents = [
+        [1, 4, 3, 2, 3, 1, 4, 3, 2, 3, 1, 4, 3, 2, 3, 6],
+        [2, 2, 4, 2, 4, 2, 2, 2, 2, 4, 2, 2],
+        [1, 6, 5, 6, 0, 1, 6, 5, 6, 0, 1, 6, 5, 6, 0, 0],
+        [5, 6, 6, 2, 3, 3, 6, 5, 6, 2, 2, 6, 5, 6, 6, 6, 0],
+        [2, 2, 4, 4, 4, 4, 1, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 0],
+        [5, 4, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2]
+    ]
+    lda = LDA(documents, 5)
+    lda.configure(10000, 2000, 10)
+    lda.gibbs()
+    theta = lda.get_theta()
+    print("theta:", theta)
