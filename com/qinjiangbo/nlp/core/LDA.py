@@ -1,9 +1,9 @@
 # coding=utf-8
 
 """
-   Date: 18/11/2016
-   Author: qinjiangbo@github.io
-   Description:
+   @date: 18/11/2016
+   @author: qinjiangbo@github.io
+   @description:
    LDA core algorithms of topic model
 """
 import random
